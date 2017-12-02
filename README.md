@@ -34,11 +34,6 @@ application = tornado.web.Application([
 
 
 生成一张验证码，并把验证码保存CODE变量
-from tornado.web import RequestHandler
-import io
-from utils import check_code
-
-CODE = ''
 
 ```
 class CheckCodeHandler(RequestHandler):
