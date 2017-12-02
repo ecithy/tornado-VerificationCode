@@ -33,21 +33,19 @@ application = tornado.web.Application([
 ```
 
 
-生成一张验证码，并把验证码保存到json文件
+生成一张验证码，并把验证码保存CODE变量
 ```
 class CheckCodeHandler(RequestHandler):
     def get(self):
         mstream = io.BytesIO()
         img, code = check_code.create_validate_code()
         img.save(mstream, "GIF")
-
-        code_dict = {}
-        code_dict['key_code'] = code
-        with open('code.json', 'w') as f:
-            json.dump(code_dict, f)
+        global CODE
+        CODE = code
         self.write(mstream.getvalue())
+
 ```
-登录时，从json文件中取出生成的验证码，和表单的验证码是否一致
+登录时，验证表单验证码
 ```
 class LoginHandler(RequestHandler):
     def post(self, *args, **kwargs):
