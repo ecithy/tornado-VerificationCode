@@ -32,10 +32,15 @@ application = tornado.web.Application([
 ], **settings)
 ```
 
-
-生成一张验证码，并把验证码保存CODE变量
-
 ```
+from tornado.web import RequestHandler
+import io
+from utils import check_code
+
+CODE = ''  # 存储验证码
+
+
+# 生成一张验证码，并把验证码保存CODE变量
 class CheckCodeHandler(RequestHandler):
     def get(self):
         mstream = io.BytesIO()
@@ -45,9 +50,17 @@ class CheckCodeHandler(RequestHandler):
         CODE = code
         self.write(mstream.getvalue())
 
-```
-登录时，验证表单验证码
-```
+
+class LoginHandler(RequestHandler):
+
+    def get(self, *args, **kwargs):
+        login_user = self.get_secure_cookie("login_user",)
+        if login_user:
+            self.write('您已登录')
+            return
+        self.render('login.html', msg="")
+
+    # 登录时，验证表单验证码
     def post(self, *args, **kwargs):
         user = self.get_argument('user')
         code = self.get_argument('code')
@@ -63,5 +76,4 @@ class CheckCodeHandler(RequestHandler):
                 self.render('login.html', msg="请输入用户名和密码")
                 return
             self.render('login.html', msg="用户名或密码错误")
-
 ```

@@ -2,9 +2,10 @@ from tornado.web import RequestHandler
 import io
 from utils import check_code
 
-CODE = ''
+CODE = ''  # 存储验证码
 
 
+# 生成一张验证码，并把验证码保存CODE变量
 class CheckCodeHandler(RequestHandler):
     def get(self):
         mstream = io.BytesIO()
@@ -24,6 +25,7 @@ class LoginHandler(RequestHandler):
             return
         self.render('login.html', msg="")
 
+    # 登录时，验证表单验证码
     def post(self, *args, **kwargs):
         user = self.get_argument('user')
         code = self.get_argument('code')
