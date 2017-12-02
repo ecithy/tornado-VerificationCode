@@ -34,6 +34,12 @@ application = tornado.web.Application([
 
 
 生成一张验证码，并把验证码保存CODE变量
+from tornado.web import RequestHandler
+import io
+from utils import check_code
+
+CODE = ''
+
 ```
 class CheckCodeHandler(RequestHandler):
     def get(self):
@@ -47,18 +53,20 @@ class CheckCodeHandler(RequestHandler):
 ```
 登录时，验证表单验证码
 ```
-class LoginHandler(RequestHandler):
     def post(self, *args, **kwargs):
-        with open('code.json', 'r') as f:
-            json_code = json.load(f)
         user = self.get_argument('user')
         code = self.get_argument('code')
-        print(code, json_code['key_code'])
 
         pwd = self.get_argument('pwd')
-        if user == 'hy' and pwd == '123' and code == json_code['key_code']:
+        if user == 'hy' and pwd == '123' and code == CODE:
             import time
             v = time.time() + 5
             self.set_secure_cookie('login_user', user+pwd, expires=v)
             self.redirect('/seed.html')
+        else:
+            if not user and not pwd:
+                self.render('login.html', msg="请输入用户名和密码")
+                return
+            self.render('login.html', msg="用户名或密码错误")
+
 ```
