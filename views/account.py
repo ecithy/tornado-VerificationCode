@@ -1,7 +1,8 @@
 from tornado.web import RequestHandler
 import io
 from utils import check_code
-import json
+
+CODE = ''
 
 
 class CheckCodeHandler(RequestHandler):
@@ -9,11 +10,8 @@ class CheckCodeHandler(RequestHandler):
         mstream = io.BytesIO()
         img, code = check_code.create_validate_code()
         img.save(mstream, "GIF")
-
-        code_dict = {}
-        code_dict['key_code'] = code
-        with open('code.json', 'w') as f:
-            json.dump(code_dict, f)
+        global CODE
+        CODE = code
         self.write(mstream.getvalue())
 
 
@@ -27,14 +25,11 @@ class LoginHandler(RequestHandler):
         self.render('login.html', msg="")
 
     def post(self, *args, **kwargs):
-        with open('code.json', 'r') as f:
-            json_code = json.load(f)
         user = self.get_argument('user')
         code = self.get_argument('code')
-        print(code, json_code['key_code'])
 
         pwd = self.get_argument('pwd')
-        if user == 'hy' and pwd == '123' and code == json_code['key_code']:
+        if user == 'hy' and pwd == '123' and code == CODE:
             import time
             v = time.time() + 5
             self.set_secure_cookie('login_user', user+pwd, expires=v)
